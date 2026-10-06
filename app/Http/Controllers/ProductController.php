@@ -5,20 +5,21 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\ActivityLog;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        if ($request->has('search') && !empty($request->search)) {
-            $search = $request->search;
-            // VULNERABLE: SQL Injection
-            $products = DB::select("SELECT p.*, u.name as creator_name FROM products p LEFT JOIN users u ON p.created_by = u.id WHERE p.title LIKE '%$search%' OR p.description LIKE '%$search%' OR p.category LIKE '%$search%' OR p.sku LIKE '%$search%'");
-            return view('products.index', ['products' => $products]);
-        }
+        $products = Product::when($request->filled('search'), function ($q) use ($request) {
+            $term = $request->input('search');
+            $q->where(function ($w) use ($term) {
+                $w->where('title', 'LIKE', "%{$term}%")
+                    ->orWhere('description', 'LIKE', "%{$term}%")
+                    ->orWhere('category', 'LIKE', "%{$term}%")
+                    ->orWhere('sku', 'LIKE', "%{$term}%");
+            });
+        })->with('creator')->where('created_by', auth()->id())->paginate(10)->withQueryString();
 
-        $products = Product::with('creator')->where('created_by', auth()->id())->paginate(10);
         return view('products.index', compact('products'));
     }
 
@@ -57,21 +58,24 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        // IDOR: TIDAK ADA pengecekan kepemilikan
+        abort_if($product->created_by !== auth()->id() && ! auth()->user()->isAdmin(), 403);
+
         return view('products.show', compact('product'));
     }
 
     public function edit(Product $product)
     {
-        // IDOR: TIDAK ADA pengecekan kepemilikan
+        abort_if($product->created_by !== auth()->id() && ! auth()->user()->isAdmin(), 403);
+
         return view('products.edit', compact('product'));
     }
 
     public function update(Request $request, Product $product)
     {
-        // IDOR: TIDAK ADA pengecekan kepemilikan
+        abort_if($product->created_by !== auth()->id() && ! auth()->user()->isAdmin(), 403);
+
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'title|unique:products,title,${product}->id',
             'description' => 'nullable|string',
             'category' => 'nullable|string|max:100',
             'price' => 'nullable|numeric',
@@ -79,23 +83,13 @@ class ProductController extends Controller
             'status' => 'required|in:active,inactive,draft',
         ]);
 
-        $product->update($validated);
-
-        ActivityLog::create([
-            'user_id' => auth()->id(),
-            'action' => 'update_product',
-            'details' => 'Updated product ID: ' . $product->id,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
-
-        return redirect()->route('products.show', $product)
-                        ->with('success', 'Product updated successfully.');
+        $product->update($request->only(['title', 'description', 'category', 'price', 'stock', 'status']));
     }
 
     public function destroy(Product $product)
     {
-        // IDOR: TIDAK ADA pengecekan kepemilikan
+        abort_if($product->created_by !== auth()->id() && ! auth()->user()->isAdmin(), 403);
+
         $product->delete();
 
         ActivityLog::create([

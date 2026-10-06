@@ -22,4 +22,20 @@ class Client extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    /**
+     * Akun portal yang terhubung ke klien ini.
+     */
+    public function users()
+    {
+        return $this->hasMany(User::class, 'client_id');
+    }
+
+    /**
+     * Aset milik klien ini. Dipakai untuk scoping insiden di portal.
+     */
+    public function assets()
+    {
+        return $this->hasMany(Asset::class, 'client_id');
+    }
 }

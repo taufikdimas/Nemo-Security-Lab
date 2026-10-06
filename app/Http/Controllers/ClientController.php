@@ -4,20 +4,29 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class ClientController extends Controller
 {
     public function index(Request $request)
     {
-        if ($request->has('search') && !empty($request->search)) {
-            $search = $request->search;
-            // VULNERABLE: SQL Injection
-            $clients = DB::select("SELECT * FROM clients WHERE name LIKE '%$search%' OR email LIKE '%$search%' OR company LIKE '%$search%'");
-            return view('clients.index', ['clients' => $clients]);
+        $query = Client::when($request->filled('search'), function ($q) use ($request) {
+            $term = $request->input('search');
+            $q->where(function ($w) use ($term) {
+                $w->where('name', 'LIKE', "%{$term}%")
+                    ->orWhere('email', 'LIKE', "%{$term}%")
+                    ->orWhere('company', 'LIKE', "%{$term}%");
+            });
+        });
+
+        if (! auth()->user()->isAdmin()) {
+            $query->where(function ($q) {
+                $q->where('created_by', auth()->id())
+                  ->orWhereNull('created_by');
+            });
         }
 
-        $clients = Client::where('created_by', auth()->id())->paginate(10);
+        $clients = $query->latest()->paginate(10)->withQueryString();
+
         return view('clients.index', compact('clients'));
     }
 
@@ -30,7 +39,7 @@ class ClientController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'nullable|email',
+            'email' => 'nullable|email|unique:clients,email',
             'phone' => 'nullable|string|max:20',
             'company' => 'nullable|string|max:255',
             'address' => 'nullable|string',
@@ -44,26 +53,39 @@ class ClientController extends Controller
 
     public function show(Client $client)
     {
-        // IDOR: TIDAK ADA pengecekan kepemilikan
+        abort_if($client->created_by !== auth()->id() && ! auth()->user()->isAdmin(), 403);
+
         return view('clients.show', compact('client'));
     }
 
     public function edit(Client $client)
     {
-        // IDOR: TIDAK ADA pengecekan kepemilikan
+        abort_if($client->created_by !== auth()->id() && ! auth()->user()->isAdmin(), 403);
+
         return view('clients.edit', compact('client'));
     }
 
     public function update(Request $request, Client $client)
     {
-        // IDOR: TIDAK ADA pengecekan kepemilikan
-        $client->update($request->all());
+        abort_if($client->created_by !== auth()->id() && ! auth()->user()->isAdmin(), 403);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'nullable|email|unique:clients,email,' . $client->id,
+            'phone' => 'nullable|string|max:20',
+            'company' => 'nullable|string|max:255',
+            'address' => 'nullable|string',
+        ]);
+
+        $client->update($validated);
+
         return redirect()->route('clients.show', $client)->with('success', 'Client updated.');
     }
 
     public function destroy(Client $client)
     {
-        // IDOR: TIDAK ADA pengecekan kepemilikan
+        abort_if($client->created_by !== auth()->id() && ! auth()->user()->isAdmin(), 403);
+
         $client->delete();
         return redirect()->route('clients.index')->with('success', 'Client deleted.');
     }

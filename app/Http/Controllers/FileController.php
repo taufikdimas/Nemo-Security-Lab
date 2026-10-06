@@ -25,7 +25,7 @@ class FileController extends Controller
             $query->where('original_name', 'LIKE', "%{$request->search}%");
         }
 
-        $files = $query->latest()->paginate(15);
+        $files = $query->latest()->paginate(15)->withQueryString();
 
         return view('files.index', compact('files'));
     }
@@ -37,9 +37,8 @@ class FileController extends Controller
 
     public function upload(Request $request)
     {
-        // VULNERABLE: Hanya validasi ukuran, tidak validasi tipe file
         $request->validate([
-            'file' => 'required|file|max:20480',
+            'file' => 'required|file|max:20480|mimes:pdf,doc,docx,xls,xlsx,txt,csv,png,jpg,jpeg',
             'description' => 'nullable|string|max:255',
         ]);
 
@@ -71,79 +70,25 @@ class FileController extends Controller
                         ->with('success', 'File uploaded successfully.');
     }
 
-    // Tambahan: import file dari URL untuk semua user
-    public function importFromUrl(Request $request)
-    {
-        $request->validate([
-            'file_url' => 'required|url',
-            'description' => 'nullable|string|max:255',
-        ]);
-
-        $url = $request->file_url;
-
-        try {
-            // SSRF: Tidak ada validasi URL internal
-            $contents = file_get_contents($url);
-            
-            if ($contents === false) {
-                return back()->withErrors(['file_url' => 'Failed to download file from URL']);
-            }
-
-            $originalName = basename(parse_url($url, PHP_URL_PATH));
-            if (empty($originalName)) {
-                $originalName = 'downloaded_file.txt';
-            }
-
-            $extension = pathinfo($originalName, PATHINFO_EXTENSION);
-            $storedName = time() . '_' . uniqid() . '.' . $extension;
-            
-            $path = 'files/' . $storedName;
-            Storage::disk('public')->put($path, $contents);
-
-            $mimeType = Storage::disk('public')->mimeType($path);
-            $fileSize = strlen($contents);
-
-            $file = File::create([
-                'original_name' => $originalName,
-                'stored_name' => $storedName,
-                'mime_type' => $mimeType,
-                'file_size' => $fileSize,
-                'path' => $path,
-                'uploaded_by' => auth()->id(),
-                'description' => $request->description,
-                'is_public' => $request->has('is_public') ? true : false,
-            ]);
-
-            ActivityLog::create([
-                'user_id' => auth()->id(),
-                'action' => 'import_file_url',
-                'details' => 'Imported file from URL: ' . $url,
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-            ]);
-
-            return redirect()->route('files.show', $file)
-                            ->with('success', 'File imported from URL successfully.');
-        } catch (\Exception $e) {
-            return back()->withErrors(['file_url' => 'Failed to process URL: ' . $e->getMessage()]);
-        }
-    }
 
     public function show(File $file)
     {
-        // IDOR: TIDAK ADA pengecekan kepemilikan
+        abort_if($file->uploaded_by !== auth()->id() && ! auth()->user()->isAdmin(), 403);
+
         return view('files.show', compact('file'));
     }
 
     public function download(File $file)
     {
-        // IDOR: TIDAK ADA pengecekan kepemilikan
+        abort_if($file->uploaded_by !== auth()->id() && ! auth()->user()->isAdmin(), 403);
+
         return Storage::disk('public')->download($file->path, $file->original_name);
     }
 
     public function destroy(File $file)
     {
-        // IDOR: TIDAK ADA pengecekan kepemilikan
+        abort_if($file->uploaded_by !== auth()->id() && ! auth()->user()->isAdmin(), 403);
+
         Storage::disk('public')->delete($file->path);
         $file->delete();
 

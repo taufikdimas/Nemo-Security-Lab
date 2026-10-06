@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Product;
 use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -104,81 +103,5 @@ class ImportController extends Controller
         ]);
 
         return view('import.result', compact('successCount', 'failedCount', 'errors', 'preview'));
-    }
-
-    public function importProducts(Request $request)
-    {
-        $request->validate([
-            'csv_file' => 'required|file|max:10240',
-        ]);
-
-        $file = $request->file('csv_file');
-        $path = $file->getRealPath();
-        
-        $handle = fopen($path, 'r');
-        
-        if ($handle === false) {
-            return back()->withErrors(['csv_file' => 'Failed to read CSV file']);
-        }
-
-        $successCount = 0;
-        $failedCount = 0;
-        $errors = [];
-        $rowNumber = 0;
-
-        while (($row = fgetcsv($handle)) !== false) {
-            $rowNumber++;
-            
-            if ($rowNumber === 1) {
-                continue;
-            }
-
-            if (count($row) < 3) {
-                $errors[] = "Row {$rowNumber}: Invalid number of columns";
-                $failedCount++;
-                continue;
-            }
-
-            [$title, $category, $price] = array_pad($row, 3, null);
-
-            $title = trim($title);
-            $category = trim($category);
-            $price = trim($price);
-
-            if (empty($title)) {
-                $errors[] = "Row {$rowNumber}: Title required";
-                $failedCount++;
-                continue;
-            }
-
-            try {
-                $product = Product::create([
-                    'title' => $title,
-                    'category' => $category,
-                    'price' => is_numeric($price) ? $price : 0,
-                    'stock' => 0,
-                    'status' => 'active',
-                    'created_by' => auth()->id(),
-                    'sku' => 'SKU-' . strtoupper(uniqid()),
-                ]);
-
-                $successCount++;
-            } catch (\Exception $e) {
-                $errors[] = "Row {$rowNumber}: " . $e->getMessage();
-                $failedCount++;
-            }
-        }
-
-        fclose($handle);
-
-        ActivityLog::create([
-            'user_id' => auth()->id(),
-            'action' => 'import_products',
-            'details' => "Imported {$successCount} products, {$failedCount} failed",
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
-
-        return view('import.result', compact('successCount', 'failedCount', 'errors'));
     }
 }

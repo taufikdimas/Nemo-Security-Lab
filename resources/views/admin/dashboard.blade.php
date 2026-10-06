@@ -36,6 +36,27 @@
         </div>
     </div>
 
+    <div class="row mt-0">
+        <div class="col-md-4">
+            <div class="card bg-secondary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Clients</h5>
+                    <h2>{{ $totalClients }}</h2>
+                    <span class="text-white">Perusahaan terdaftar</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Client Portal Accounts</h5>
+                    <h2>{{ $clientUsers }}</h2>
+                    <a href="{{ route('admin.users.index', ['role' => 'client']) }}" class="text-white">Manage Client Users →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="card mt-4">
         <div class="card-header">
             <h5>Recent Users</h5>

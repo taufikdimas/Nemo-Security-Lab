@@ -34,31 +34,6 @@
                 </div>
             </div>
         </div>
-        
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-box"></i> Import Products from CSV</h5>
-                </div>
-                <div class="card-body">
-                    <form method="POST" action="{{ route('import.products') }}" enctype="multipart/form-data">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="csv_file" class="form-label">CSV File</label>
-                            <input type="file" class="form-control" id="csv_file" name="csv_file" 
-                                   accept=".csv,.txt" required>
-                            <small class="text-muted">
-                                Format: title,category,price<br>
-                                Example: Product A,electronics,50000
-                            </small>
-                        </div>
-                        <button type="submit" class="btn btn-success">
-                            <i class="bi bi-upload"></i> Import Products
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
     </div>
 
     @if(auth()->user()->role === 'admin')

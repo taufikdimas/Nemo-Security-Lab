@@ -1,305 +1,320 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Nemo Security Lab')</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%232563eb' d='M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 6.5-4 4a.5.5 0 0 1-.7 0l-2-2a.5.5 0 0 1 .7-.7l1.65 1.65 3.65-3.65a.5.5 0 0 1 .7.7z'/%3E%3C/svg%3E">
+    <title>@yield('title', 'SecureOps')</title>
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%2306b6d4' d='M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 6.5-4 4a.5.5 0 0 1-.7 0l-2-2a.5.5 0 0 1 .7-.7l1.65 1.65 3.65-3.65a.5.5 0 0 1 .7.7z'/%3E%3C/svg%3E">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #0d6efd;
-            --navy: #0a1e3c;
-            --navy-light: #10315e;
-            --accent: #3b82f6;
-            --sidebar-bg: #0f2a4a;
-            --sidebar-hover: #1e3a5f;
-            --text-light: #e0e7ff;
-        }
-
-        body {
-            background-color: #f0f4f8;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .navbar {
-            background: linear-gradient(135deg, #0a1e3c 0%, #10315e 100%);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-        }
-
-        .navbar-brand {
-            font-weight: 700;
-            color: #ffffff !important;
-            letter-spacing: 0.5px;
-        }
-        .navbar-brand i {
-            color: #60a5fa;
-        }
-
-        .navbar .nav-link {
-            color: #cbd5e1 !important;
-        }
-        .navbar .nav-link:hover {
-            color: #ffffff !important;
-        }
-        .navbar .dropdown-menu {
-            background-color: #ffffff;
-            border: none;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
-
-        .sidebar {
-            min-height: calc(100vh - 56px);
-            background: linear-gradient(180deg, #0f2a4a 0%, #0a1e3c 100%);
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-            padding-top: 20px;
-        }
-        .sidebar .nav-link {
-            color: #cbd5e1;
-            padding: 10px 20px;
-            border-radius: 8px;
-            margin: 3px 12px;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        .sidebar .nav-link i {
-            margin-right: 10px;
-            color: #60a5fa;
-        }
-        .sidebar .nav-link:hover {
-            background-color: #1e3a5f;
-            color: #ffffff;
-        }
-        .sidebar .nav-link.active {
-            background-color: #2563eb;
-            color: #ffffff;
-            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
-        }
-
-        .card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            transition: box-shadow 0.2s;
-        }
-        .card:hover {
-            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-        }
-        .card-header {
-            background-color: #ffffff;
-            border-bottom: 1px solid #e9ecef;
-            font-weight: 600;
-            border-radius: 12px 12px 0 0;
-        }
-
-        .btn-primary {
-            background-color: #2563eb;
-            border-color: #2563eb;
-        }
-        .btn-primary:hover {
-            background-color: #1d4ed8;
-            border-color: #1d4ed8;
-        }
-
-        .table th {
-            background-color: #f8fafc;
-            color: #475569;
-            font-weight: 600;
-            border-bottom: 2px solid #e2e8f0;
-        }
-        .table td {
-            vertical-align: middle;
-        }
-
-        .badge-soft-success {
-            background-color: #dcfce7;
-            color: #16a34a;
-            padding: 5px 10px;
-            border-radius: 20px;
-        }
-        .badge-soft-warning {
-            background-color: #fef9c3;
-            color: #ca8a04;
-            padding: 5px 10px;
-            border-radius: 20px;
-        }
-        .badge-soft-danger {
-            background-color: #fee2e2;
-            color: #dc2626;
-            padding: 5px 10px;
-            border-radius: 20px;
-        }
-
-        .main-content {
-            padding: 24px;
-        }
-
-        .stat-card {
-            border-radius: 12px;
-            color: #fff;
-            border: none;
-        }
-        .stat-card .card-body {
-            padding: 1.5rem;
-        }
-        .stat-card i {
-            font-size: 2.5rem;
-            opacity: 0.8;
-        }
-        .bg-primary-soft {
-            background: linear-gradient(135deg, #2563eb, #1e40af);
-        }
-        .bg-success-soft {
-            background: linear-gradient(135deg, #16a34a, #15803d);
-        }
-        .bg-warning-soft {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-        }
-        .bg-info-soft {
-            background: linear-gradient(135deg, #06b6d4, #0891b2);
-        }
-    </style>
+    @include('layouts.partials.app-styles')
 </head>
+
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/dashboard">
-                <i class="bi bi-shield-lock-fill"></i> Nemo Security Lab
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+    @php
+    $navOpenIncidents = \App\Models\Incident::where('status', 'open')->count();
+    // Daftar insiden terbuka untuk panel notifikasi di topbar.
+    $navRecentIncidents = \App\Models\Incident::with('assignedTo')
+    ->where('status', 'open')
+    ->latest()
+    ->limit(6)
+    ->get();
+    $topbarTitle = trim(strip_tags($__env->getSection('title', 'Dashboard')));
+    @endphp
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon"><i class="bi bi-shield-lock-fill"></i></div>
+            <div class="brand-text">
+                <div class="brand-name">SecureOps</div>
+                <div class="brand-sub">PT Garuda Siber Nusantara</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Ringkasan</div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"
+                    href="{{ route('dashboard') }}">
+                    <i class="bi bi-speedometer2"></i> Beranda
+                </a>
+            </div>
+
+            <div class="nav-section-label">Operasional</div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->is('incidents*') ? 'active' : '' }}"
+                    href="{{ route('incidents.index') }}">
+                    <i class="bi bi-clipboard2-pulse"></i> Insiden
+                    @if($navOpenIncidents > 0)
+                    <span class="nav-badge">{{ $navOpenIncidents }}</span>
+                    @endif
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->is('assets*') ? 'active' : '' }}" href="{{ route('assets.index') }}">
+                    <i class="bi bi-hdd-network"></i> Aset
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->is('vulndb*') ? 'active' : '' }}" href="{{ route('vulndb.index') }}">
+                    <i class="bi bi-bug"></i> Basis Kerentanan
+                </a>
+            </div>
+
+            <div class="nav-section-label">Pentest</div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->is('pentest/engagements*') ? 'active' : '' }}"
+                    href="{{ route('pentest.engagements.index') }}">
+                    <i class="bi bi-shield-check"></i> Engagement Pentest
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->is('pentest/reports*') ? 'active' : '' }}"
+                    href="{{ route('pentest.reports.index') }}">
+                    <i class="bi bi-file-earmark-lock2"></i> Laporan Pentest
+                </a>
+            </div>
+
+            <div class="nav-section-label">Manajemen</div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->is('projects*') ? 'active' : '' }}"
+                    href="{{ route('projects.index') }}">
+                    <i class="bi bi-kanban"></i> Proyek
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->is('clients*') ? 'active' : '' }}" href="{{ route('clients.index') }}">
+                    <i class="bi bi-people"></i> Klien
+                </a>
+            </div>
+            @if(auth()->user()->role === 'admin')
+            <div class="nav-item">
+                <a class="nav-link {{ request()->is('employees*') ? 'active' : '' }}"
+                    href="{{ route('employees.index') }}">
+                    <i class="bi bi-person-badge"></i> Team
+                </a>
+            </div>
+            @endif
+
+            <div class="nav-section-label">Perangkat</div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->routeIs('tools.diagnostic') ? 'active' : '' }}"
+                    href="{{ route('tools.diagnostic') }}">
+                    <i class="bi bi-broadcast-pin"></i> Diagnostik Jaringan
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->routeIs('tools.diagnostic.history') ? 'active' : '' }}"
+                    href="{{ route('tools.diagnostic.history') }}">
+                    <i class="bi bi-clock-history"></i> Riwayat Diagnostik
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->is('reports*') ? 'active' : '' }}" href="{{ route('reports.index') }}">
+                    <i class="bi bi-file-earmark-bar-graph"></i> Laporan (SOC)
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->is('files*') ? 'active' : '' }}" href="{{ route('files.index') }}">
+                    <i class="bi bi-folder2-open"></i> Berkas
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->is('import*') ? 'active' : '' }}" href="{{ route('import.index') }}">
+                    <i class="bi bi-upload"></i> Impor Data
+                </a>
+            </div>
+
+            @if(auth()->user()->role === 'admin')
+            <div class="nav-section-label">Admin</div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->is('admin/users*') ? 'active' : '' }}"
+                    href="{{ route('admin.users.index') }}">
+                    <i class="bi bi-person-gear"></i> Manajemen Pengguna
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->is('admin/files*') ? 'active' : '' }}"
+                    href="{{ route('admin.files.index') }}">
+                    <i class="bi bi-folder-check"></i> Manajemen Berkas
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->is('admin/config*') ? 'active' : '' }}"
+                    href="{{ route('admin.config') }}">
+                    <i class="bi bi-sliders"></i> Konfigurasi Sistem
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->is('admin/threats*') ? 'active' : '' }}"
+                    href="{{ route('admin.threats') }}">
+                    <i class="bi bi-radar"></i> Monitor Ancaman
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link {{ request()->is('admin/activity*') ? 'active' : '' }}"
+                    href="{{ route('admin.activity') }}">
+                    <i class="bi bi-journal-text"></i> Log Aktivitas
+                </a>
+            </div>
+            @endif
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="{{ route('profile.edit') }}" class="footer-link"><i class="bi bi-person"></i> Profil</a>
+            <form action="{{ route('logout') }}" method="POST" style="display:inline">
+                @csrf
+                <button type="submit" class="footer-btn-logout"><i class="bi bi-box-arrow-right"></i> Keluar</button>
+            </form>
+        </div>
+    </aside>
+
+    <nav class="topbar">
+        <div class="topbar-left">
+            <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Buka navigasi">
+                <i class="bi bi-list"></i>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle"></i>
-                            {{ auth()->user()->name }}
-                            @if(auth()->user()->role === 'admin')
-                                <span class="badge bg-danger ms-1">Admin</span>
-                            @else
-                                <span class="badge bg-info ms-1">User</span>
-                            @endif
+            <div class="breadcrumb-nav">
+                <span>SecureOps</span>
+                <span class="sep">/</span>
+                <span class="current">{{ $topbarTitle }}</span>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <div class="status-badge">
+                <span class="dot-green"></span>
+                <span>Sistem Aktif</span>
+            </div>
+            <div class="dropdown">
+                <div class="notif-btn" data-bs-toggle="dropdown" role="button" tabindex="0" title="Notifikasi"
+                    aria-label="Notifikasi">
+                    <i class="bi bi-bell"></i>
+                    @if($navOpenIncidents > 0)
+                    <span class="badge-count">{{ $navOpenIncidents }}</span>
+                    @endif
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end notif-menu">
+                    <li class="notif-head">
+                        <span>Notifikasi</span>
+                        <span class="text-muted small">{{ $navOpenIncidents }} insiden terbuka</span>
+                    </li>
+                    @forelse($navRecentIncidents as $incident)
+                    <li>
+                        <a class="dropdown-item notif-item" href="{{ route('incidents.show', $incident) }}">
+                            <span class="notif-prio {{ $incident->priority }}"></span>
+                            <span class="notif-body">
+                                <span class="notif-title">{{ $incident->title }}</span>
+                                <span class="notif-meta">
+                                    {{ $incident->ticket_number }} &middot;
+                                    {{ $incident->created_at?->diffForHumans() }}
+                                </span>
+                            </span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/profile"><i class="bi bi-person"></i> Profile</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form method="POST" action="/logout">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item text-danger">
-                                        <i class="bi bi-box-arrow-right"></i> Logout
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
+                    </li>
+                    @empty
+                    <li>
+                        <span class="dropdown-item-text text-muted small">
+                            Tidak ada insiden terbuka.
+                        </span>
+                    </li>
+                    @endforelse
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <a class="dropdown-item notif-foot" href="{{ route('incidents.index') }}">
+                            Lihat semua insiden
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="dropdown">
+                <div class="user-menu" data-bs-toggle="dropdown" style="cursor:pointer">
+                    <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="avatar"
+                        style="object-fit: cover; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border-subtle);">
+                    <div class="user-info">
+                        <div class="user-name">{{ auth()->user()->name }}</div>
+                        <div class="user-role">{{ match(auth()->user()->role) {
+                        'admin' => 'Administrator',
+                        'client' => 'Klien',
+                        default => 'Pengguna',
+                    } }}</div>
+                    </div>
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="bi bi-person"></i>
+                            Profil</a></li>
+                    <li><a class="dropdown-item" href="{{ route('profile.api') }}"><i class="bi bi-key"></i> Akses
+                            API</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="dropdown-item text-danger">
+                                <i class="bi bi-box-arrow-right"></i> Keluar
+                            </button>
+                        </form>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-2 sidebar d-none d-md-block">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}" href="/dashboard">
-                            <i class="bi bi-speedometer2"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->is('products*') ? 'active' : '' }}" href="/products">
-                            <i class="bi bi-box-seam"></i> Products
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->is('projects*') ? 'active' : '' }}" href="/projects">
-                            <i class="bi bi-kanban"></i> Projects
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->is('clients*') ? 'active' : '' }}" href="/clients">
-                            <i class="bi bi-people"></i> Clients
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->is('employees*') ? 'active' : '' }}" href="/employees">
-                            <i class="bi bi-person-badge"></i> Employees
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->is('vulndb*') ? 'active' : '' }}" href="/vulndb">
-                            <i class="bi bi-bug"></i> Vuln DB
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->is('tools*') ? 'active' : '' }}" href="/tools">
-                            <i class="bi bi-terminal"></i> Network Tools
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->is('files*') ? 'active' : '' }}" href="/files">
-                            <i class="bi bi-folder2-open"></i> Files
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->is('import*') ? 'active' : '' }}" href="/import">
-                            <i class="bi bi-upload"></i> Import Data
-                        </a>
-                    </li>
-                    @if(auth()->user()->role === 'admin')
-                    <hr class="text-light">
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->is('admin/dashboard') ? 'active' : '' }}" href="/admin/dashboard">
-                            <i class="bi bi-shield-check"></i> Admin Panel
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->is('admin/users*') ? 'active' : '' }}" href="/admin/users">
-                            <i class="bi bi-people"></i> User Management
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->is('admin/files*') ? 'active' : '' }}" href="/admin/files">
-                            <i class="bi bi-folder-check"></i> File Management
-                        </a>
-                    </li>
-                    @endif
-                </ul>
-            </div>
+    <div class="main-wrapper">
+        <div class="main-content">
+            @hasSection('breadcrumb')
+            <nav class="breadcrumb-panel" aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    @yield('breadcrumb')
+                </ol>
+            </nav>
+            @endif
 
-            <!-- Main Content -->
-            <div class="col-md-10 main-content">
-                @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <i class="bi bi-check-circle"></i> {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
+            @include('layouts.partials.flash')
 
-                @if(session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <i class="bi bi-exclamation-circle"></i> {{ session('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
-
-                @yield('content')
-            </div>
+            @yield('content')
         </div>
+    </div>
+
+    <div class="app-footer">
+        <small>SecureOps Platform v2.4.1 &middot; Build 2026.02 &middot; PT Garuda Siber Nusantara</small>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+    (function() {
+        var toggle = document.getElementById('sidebarToggle');
+        var sidebar = document.getElementById('sidebar');
+        if (toggle && sidebar) {
+            toggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                sidebar.classList.toggle('open');
+            });
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 992 && sidebar.classList.contains('open') && !sidebar.contains(e
+                        .target)) {
+                    sidebar.classList.remove('open');
+                }
+            });
+        }
+
+        // Toast: auto-dismiss after 5s.
         setTimeout(function() {
-            document.querySelectorAll('.alert').forEach(function(alert) {
-                alert.classList.remove('show');
+            document.querySelectorAll('.toast[data-autoclose="1"]').forEach(function(el) {
+                el.style.transition = 'opacity .3s ease';
+                el.style.opacity = '0';
+                setTimeout(function() {
+                    el.remove();
+                }, 300);
             });
         }, 5000);
+    })();
     </script>
     @yield('scripts')
 </body>
+
 </html>

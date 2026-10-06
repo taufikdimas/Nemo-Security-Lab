@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -23,7 +24,14 @@ class ProfileController extends Controller
             'position' => 'nullable|string|max:100',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
+            'password' => 'nullable|string|min:6|confirmed',
         ]);
+
+        if (!empty($validated['password'])) {
+            $validated['password'] = \Illuminate\Support\Facades\Hash::make($validated['password']);
+        } else {
+            unset($validated['password']);
+        }
 
         auth()->user()->update($validated);
 
@@ -40,9 +48,8 @@ class ProfileController extends Controller
 
     public function updateAvatar(Request $request)
     {
-        // Vulnerable: Hanya validasi ukuran, tidak validasi tipe file
         $request->validate([
-            'avatar' => 'required|file|max:2048',
+            'avatar' => 'required|file|max:5120|mimes:jpg,jpeg,png,gif,webp',
         ]);
 
         $user = auth()->user();
@@ -54,52 +61,24 @@ class ProfileController extends Controller
         $path = $request->file('avatar')->store('avatars', 'public');
         $user->update(['avatar' => $path]);
 
-        return back()->with('success', 'Avatar updated successfully.');
+        // Synchronize with employee record if exists
+        $employee = \App\Models\Employee::where('email', $user->email)->first();
+        if ($employee) {
+            $employee->update(['photo' => $path]);
+        }
+
+        return back()->with('success', 'Foto profil berhasil diperbarui.');
     }
 
-    public function updateAvatarFromUrl(Request $request)
+    public function apiAccess()
     {
-        $request->validate([
-            'avatar_url' => 'required|url',
-        ]);
-
-        $url = $request->avatar_url;
         $user = auth()->user();
 
-        try {
-            // SSRF: Tidak ada validasi URL internal
-            // Bisa akses http://127.0.0.1, http://169.254.169.254, dll
-            $contents = file_get_contents($url);
-            
-            if ($contents === false) {
-                return back()->withErrors(['avatar_url' => 'Failed to download image from URL']);
-            }
-
-            $extension = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
-            if (empty($extension)) {
-                $extension = 'jpg';
-            }
-
-            if ($user->avatar) {
-                Storage::disk('public')->delete($user->avatar);
-            }
-
-            $filename = 'avatars/' . uniqid() . '.' . $extension;
-            Storage::disk('public')->put($filename, $contents);
-            
-            $user->update(['avatar' => $filename]);
-
-            ActivityLog::create([
-                'user_id' => $user->id,
-                'action' => 'update_avatar_url',
-                'details' => 'Updated avatar from URL: ' . $url,
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-            ]);
-
-            return back()->with('success', 'Avatar updated from URL successfully.');
-        } catch (\Exception $e) {
-            return back()->withErrors(['avatar_url' => 'Failed to process URL: ' . $e->getMessage()]);
+        if (blank($user->api_token)) {
+            $user->api_token = User::generateApiToken($user->email, $user->created_at ?? now());
+            $user->save();
         }
+
+        return view('profile.api', ['user' => $user]);
     }
 }

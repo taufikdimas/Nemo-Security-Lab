@@ -19,6 +19,34 @@ class Project extends Model
         'created_by',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'start_date' => 'date',
+            'end_date' => 'date',
+        ];
+    }
+
+    /**
+     * Project completion is derived from elapsed calendar time between the
+     * agreed start and end dates, so the progress bar always reflects the
+     * real schedule instead of a manually typed percentage.
+     */
+    public function progressPercent(): int
+    {
+        if (! $this->start_date || ! $this->end_date) {
+            return 0;
+        }
+
+        $total = $this->start_date->diffInDays($this->end_date);
+
+        if ($total <= 0) {
+            return 100;
+        }
+
+        return (int) min(100, max(0, round($this->start_date->diffInDays(now()) / $total * 100)));
+    }
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
@@ -27,6 +55,11 @@ class Project extends Model
     public function comments()
     {
         return $this->hasMany(ProjectComment::class);
+    }
+
+    public function members()
+    {
+        return $this->belongsToMany(User::class, 'project_members')->withTimestamps();
     }
 
     public function scopeSearch($query, $search)

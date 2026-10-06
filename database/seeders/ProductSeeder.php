@@ -10,8 +10,8 @@ class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::where('email', 'admin@example.test')->first();
-        $user = User::where('email', 'user@example.test')->first();
+        $admin = User::where('email', 'admin@garuda-siber.internal')->first();
+        $user = User::where('email', 'user@garuda-siber.internal')->first();
 
         $products = [
             [

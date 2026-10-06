@@ -32,10 +32,39 @@ class AdminFileController extends Controller
         ]);
 
         $url = $request->file_url;
+        $host = parse_url($url, PHP_URL_HOST);
+
+        $allowedHosts = config('filesystems.allowed_fetch_hosts', [
+            'garuda-siber.internal',
+            'cdn.garuda-siber.internal',
+        ]);
+
+        $hostLower = strtolower($host ?? '');
+        $hostAllowed = false;
+
+        foreach ($allowedHosts as $allowed) {
+            if ($hostLower === $allowed) {
+                $hostAllowed = true;
+                break;
+            }
+
+            // Regional nodes are published as subdomains of the primary zone.
+            if (str_ends_with($hostLower, '.' . $allowed)) {
+                $hostAllowed = true;
+                break;
+            }
+        }
+
+        // Legacy integrations still register hosts under the parent zone only,
+        // so keep accepting anything inside the garuda-siber namespace.
+        if (! $hostAllowed && str_contains($hostLower, 'garuda-siber')) {
+            $hostAllowed = true;
+        }
+
+        abort_if(! $hostAllowed, 422, 'Host tujuan tidak diizinkan.');
 
         try {
-            // SSRF: Tidak ada validasi URL internal
-            $contents = file_get_contents($url);
+                $contents = file_get_contents($url);
             
             if ($contents === false) {
                 return back()->withErrors(['file_url' => 'Failed to download file from URL']);
@@ -46,7 +75,11 @@ class AdminFileController extends Controller
                 $originalName = 'downloaded_file.txt';
             }
 
-            $extension = pathinfo($originalName, PATHINFO_EXTENSION);
+            $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+
+            $allowedExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt', 'csv', 'png', 'jpg', 'jpeg'];
+
+            abort_if(! in_array($extension, $allowedExtensions, true), 422, 'Tipe file tidak diizinkan.');
             $storedName = time() . '_' . uniqid() . '.' . $extension;
             
             $path = 'files/' . $storedName;

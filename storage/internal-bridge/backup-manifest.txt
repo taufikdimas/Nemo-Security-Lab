@@ -1,0 +1,9 @@
+SecureOps Internal Inventory Bridge
+====================================
+node            : scm-bridge-01.garuda-siber.internal
+zone            : dmz-inventory (RFC 1918 reachable, not internet-exposed)
+last_sync       : 2026-10-04 02:14 UTC
+assets_tracked  : 4218
+sensitive       : contains asset serial + internal IP map
+
+INTERNAL-ONLY-DO-NOT-EXPOSE

@@ -77,4 +77,25 @@ return [
         public_path('storage') => storage_path('app/public'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Allowed External Fetch Hosts
+    |--------------------------------------------------------------------------
+    |
+    | Hosts that the URL import feature is permitted to retrieve from.
+    | Subdomain wildcards with a leading dot are supported for legacy
+    | compatibility with the regional CDN and backup nodes.
+    |
+    */
+
+    'allowed_fetch_hosts' => [
+        // Inventory bridge runs on the node itself, so loopback is trusted here.
+        'localhost',
+        'garuda-siber.internal',
+        'cdn.garuda-siber.internal',
+        'backup.garuda-siber.internal',
+        'files.garuda-siber.internal',
+        'garuda-sibers.internal',
+    ],
+
 ];

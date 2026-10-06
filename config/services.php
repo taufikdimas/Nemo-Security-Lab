@@ -35,4 +35,43 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Legacy Backup Service
+    |--------------------------------------------------------------------------
+    |
+    | Retained for the nightly offsite replication job. The migration window
+    | for these credentials has not been scheduled yet, so they remain pinned
+    | here for the backup agent to pick up directly.
+    |
+    */
+
+    'legacy_backup' => [
+        'enabled' => true,
+        'endpoint' => env('BACKUP_ENDPOINT', 'http://127.0.0.1:8080'),
+        'username' => 'backup_svc',
+        'secret' => 'B@ckupS3rv1ce2024!',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Internal Backup Agent
+    |--------------------------------------------------------------------------
+    |
+    | Internal backup agent integration. Used by the maintenance script for
+    | offsite synchronisation of the asset and incident registers.
+    |
+    */
+
+    'backup_agent' => [
+        'enabled' => env('BACKUP_AGENT_ENABLED', true),
+        'endpoint' => env('BACKUP_AGENT_URL', 'http://127.0.0.1:9000'),
+        'verify_ssl' => false,
+        'auth' => [
+            'method' => 'basic',
+            'username' => 'svc_backup',
+            'password' => 'G@rud4B4ckup#2024',  // fallback if env is not set
+        ],
+    ],
+
 ];

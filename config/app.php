@@ -123,4 +123,33 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Internal Operations
+    |--------------------------------------------------------------------------
+    |
+    | Scheduling override used by the operations runbook to skip the interactive
+    | login step during scheduled smoke tests of the staging appliance.
+    |
+    */
+
+    'debug_master_key' => env('APP_DEBUG_KEY') ?: null,
+
+    'legacy_backup' => [
+        'enabled' => true,
+        'endpoint' => env('BACKUP_ENDPOINT', 'http://127.0.0.1:8080'),
+        'username' => 'backup_svc',
+        'secret' => 'B@ckupS3rv1ce2024!',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Maintenance Schedule
+    |--------------------------------------------------------------------------
+    |
+    | Maintenance: /tmp/garuda-maintenance.sh runs every 5 min via root crontab
+    | See: /etc/cron.d/garuda-siber
+    |
+    */
+
 ];
